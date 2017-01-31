@@ -76,9 +76,10 @@ namespace LiveTv.Vdr
             throw new NotImplementedException();
         }
 
-        public Task CloseLiveStream(string id, CancellationToken cancellationToken)
+        public async Task CloseLiveStream(string id, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            _logger.Debug("[LiveTV.Vdr]  {0}...", nameof(CloseLiveStream));
+            _logger.Info("[LiveTV.Vdr] Closing stream" + id);
         }
 
         public Task CreateSeriesTimerAsync(SeriesTimerInfo info, CancellationToken cancellationToken)
@@ -99,7 +100,11 @@ namespace LiveTv.Vdr
         public Task<ImageStream> GetChannelImageAsync(string channelId, CancellationToken cancellationToken)
         {
             // Leave as is. This is handled by supplying image url to ChannelInfo
+<<<<<<< HEAD
 	    throw new NotImplementedException();
+=======
+            throw new NotImplementedException();
+>>>>>>> 59a2537617ffe4fff747a91a094f7d0776bf910c
         }
 
         public async Task<IEnumerable<ChannelInfo>> GetChannelsAsync(CancellationToken cancellationToken)
@@ -119,6 +124,7 @@ namespace LiveTv.Vdr
 
         public async Task<MediaSourceInfo> GetChannelStream(string channelId, string streamId, CancellationToken cancellationToken)
         {
+<<<<<<< HEAD
             _logger.Info("[LiveTV.Vdr] Start ChannelStream");
             var config = Plugin.Instance.Configuration;
             var baseUrl = "http://" + Plugin.Instance.Configuration.VDR_ServerName + ":" + Plugin.Instance.Configuration.VDR_HTTP_Port;
@@ -151,23 +157,44 @@ namespace LiveTv.Vdr
                 SupportsProbing = false
             };
 
+=======
+            _logger.Debug("[LiveTV.Vdr]  {0}...", nameof(GetChannelStream));
+            var baseUri = Plugin.Instance.Configuration.VDR_HttpStream_BaseUrl;
+            var streamUri = string.Format("{0}/TS/{1}", baseUri, channelId);
+
+            _logger.Info("[LiveTV.Vdr] StreamUrl: {0}", streamUri);
+
+            return LiveTvHelper.CreateMediaSourceInfo(channelId, streamUri);
+>>>>>>> 59a2537617ffe4fff747a91a094f7d0776bf910c
         }
 
         public Task<List<MediaSourceInfo>> GetChannelStreamMediaSources(string channelId, CancellationToken cancellationToken)
         {
+            _logger.Debug("[LiveTV.Vdr]  {0} not implemented", nameof(GetChannelStreamMediaSources));
             throw new NotImplementedException();
         }
 
-        public Task<SeriesTimerInfo> GetNewTimerDefaultsAsync(CancellationToken cancellationToken, ProgramInfo program = null)
+        public async Task<SeriesTimerInfo> GetNewTimerDefaultsAsync(CancellationToken cancellationToken, ProgramInfo program = null)
         {
-            throw new NotImplementedException();
+            _logger.Info("[LiveTV.Vdr]  {0}...", nameof(GetNewTimerDefaultsAsync));
+
+            return await Task.Factory.StartNew(() =>               
+            {
+                return new SeriesTimerInfo
+                {
+                    PostPaddingSeconds = 120, //TODO: if it can't be extracted via Restful api, move to config or extend restful api
+                    PrePaddingSeconds = 120,
+                    RecordAnyChannel = false, // TODO (clarify): from my understanding: important for series timer (let seriestimer look on any channel for creating timers)
+                    RecordAnyTime = true,
+                    RecordNewOnly = false
+                };
+            });
         }
 
         public Task<ImageStream> GetProgramImageAsync(string programId, string channelId, CancellationToken cancellationToken)
         {
-            // Leave as is. This is handled by supplying image url to ChannelInfo
+            _logger.Debug("[LiveTV.Vdr]  {0} not implemented", nameof(GetRecordingImageAsync));
             throw new NotImplementedException();
-            //return null;
         }
 
         public async Task<IEnumerable<ProgramInfo>> GetProgramsAsync(string channelId, DateTime startDateUtc, DateTime endDateUtc, CancellationToken cancellationToken)
@@ -208,8 +235,13 @@ namespace LiveTv.Vdr
 
         public Task<ImageStream> GetRecordingImageAsync(string recordingId, CancellationToken cancellationToken)
         {
+<<<<<<< HEAD
             _logger.Info("[LiveTV.Vdr]  {0} not implemented", nameof(GetRecordingImageAsync));
 	    throw new NotImplementedException();
+=======
+            _logger.Debug("[LiveTV.Vdr]  {0} not implemented", nameof(GetRecordingImageAsync));
+            throw new NotImplementedException();
+>>>>>>> 59a2537617ffe4fff747a91a094f7d0776bf910c
         }
 
         public async Task<IEnumerable<RecordingInfo>> GetRecordingsAsync(CancellationToken cancellationToken)
@@ -229,6 +261,7 @@ namespace LiveTv.Vdr
 
         public async Task<MediaSourceInfo> GetRecordingStream(string recordingId, string streamId, CancellationToken cancellationToken)
         {
+<<<<<<< HEAD
                    _logger.Info("[LiveTV.Vdr] Start RecordingStream");
             var config = Plugin.Instance.Configuration;
             var baseUrl = "http://" + Plugin.Instance.Configuration.VDR_ServerName + ":" + Plugin.Instance.Configuration.VDR_HTTP_Port;
@@ -262,10 +295,29 @@ namespace LiveTv.Vdr
             };
 
 
+=======
+            _logger.Debug("[LiveTV.Vdr]  {0}...", nameof(GetRecordingStream));
+            var baseUri = Plugin.Instance.Configuration.VDR_HttpStream_BaseUrl;
+            int recordingNo;
+            if (int.TryParse(recordingId, out recordingNo))
+            {
+                var streamUri = string.Format("{0}/{1}.rec.ts", baseUri, ++recordingNo);
+
+                _logger.Info("[LiveTV.Vdr] Stream recording: {0}", streamUri);
+
+                return LiveTvHelper.CreateMediaSourceInfo(recordingId, streamUri);
+            }
+            else
+            {
+                _logger.Info("[LiveTV.Vdr] Parsing RecordingID failed, recordingId={0}", recordingId);
+                return null;
+            }
+>>>>>>> 59a2537617ffe4fff747a91a094f7d0776bf910c
         }
 
         public Task<List<MediaSourceInfo>> GetRecordingStreamMediaSources(string recordingId, CancellationToken cancellationToken)
         {
+            _logger.Debug("[LiveTV.Vdr]  {0} not implemented", nameof(GetRecordingStreamMediaSources));
             throw new NotImplementedException();
         }
 
